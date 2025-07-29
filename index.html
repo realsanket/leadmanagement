@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadConnect AI - Intelligent Lead Prioritization</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN for analytics charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">LC</div>
+                    <div class="logo-text">
+                        <h1>LeadConnect AI</h1>
+                        <span>Lead Prioritization</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="#" class="nav-link" data-target="allLeadsView">
+                            <span class="nav-icon">👥</span>
+                            All Leads
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="hotLeadsView">
+                            <span class="nav-icon">⚡</span>
+                            Hot Leads
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="analyticsView">
+                            <span class="nav-icon">📈</span>
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="settingsView">
+                            <span class="nav-icon">⚙️</span>
+                            Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-target="importLeadsView">
+                            <span class="nav-icon">⬆️</span>
+                            Import Leads
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alerts/Notifications -->
+            <div id="alertBar" class="alert-bar" style="display:none;"></div>
+            <!-- All Leads View -->
+            <div id="allLeadsView" class="content-view active">
+                <!-- Header -->
+                <header class="dashboard-header">
+                    <div class="header-left">
+                        <h1>Lead Prioritization Dashboard</h1>
+                        <p>AI-powered lead scoring and recommendations</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-info">
+                            <div class="user-avatar">JS</div>
+                            <div class="user-details">
+                                <span class="user-name">John Smith</span>
+                                <span class="user-role">Sales Manager</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Filters and Controls -->
+                <section class="filters-section">
+                    <div class="filters-container">
+                        <div class="search-container">
+                            <input type="text" id="searchInput" class="form-control search-input" placeholder="Search leads or companies...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="intentFilter" class="form-control filter-select">
+                                <option value="">All Intent Scores</option>
+                                <option value="high">High (85-100%)</option>
+                                <option value="warm">Warm (60-84%)</option>
+                                <option value="cold">Cold (<60%)</option>
+                            </select>
+                            <select id="industryFilter" class="form-control filter-select">
+                                <option value="">All Industries</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Education">Education</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Energy">Energy</option>
+                            </select>
+                            <select id="sizeFilter" class="form-control filter-select">
+                                <option value="">All Company Sizes</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Mid-Market">Mid-Market</option>
+                                <option value="Small Business">Small Business</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lead List -->
+                <section class="leads-section">
+                    <div class="leads-header">
+                        <h2>Prioritized Leads (<span id="leadCount">0</span>)</h2>
+                        <div class="view-controls">
+                            <button class="view-btn active" data-view="card">Card View</button>
+                            <button class="view-btn" data-view="list">List View</button>
+                        </div>
+                    </div>
+                    <div id="leadsContainer" class="leads-container">
+                        <!-- Leads will be dynamically rendered here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Hot Leads View -->
+            <div id="hotLeadsView" class="content-view hidden">
+                <header class="dashboard-header">
+                    <div class="header-left">
+                        <h1>Hot Leads Dashboard</h1>
+                        <p>High-intent leads requiring immediate attention</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-info">
+                            <div class="user-avatar">JS</div>
+                            <div class="user-details">
+                                <span class="user-name">John Smith</span>
+                                <span class="user-role">Sales Manager</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <section class="filters-section">
+                    <div class="filters-container">
+                        <div class="search-container">
+                            <input type="text" id="hotSearchInput" class="form-control search-input" placeholder="Search hot leads...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="hotIndustryFilter" class="form-control filter-select">
+                                <option value="">All Industries</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Education">Education</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Energy">Energy</option>
+                            </select>
+                            <select id="hotSizeFilter" class="form-control filter-select">
+                                <option value="">All Company Sizes</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Mid-Market">Mid-Market</option>
+                                <option value="Small Business">Small Business</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="leads-section">
+                    <div class="leads-header">
+                        <h2>Hot Leads (<span id="hotLeadCount">0</span>)</h2>
+                    </div>
+                    <div id="hotLeadsContainer" class="leads-container">
+                        <!-- Hot leads will be dynamically rendered here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analyticsView" class="content-view hidden">
+                <div style="padding: var(--space-32);">
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-24);">Analytics Dashboard</h2>
+                    <!-- KPI Cards -->
+                    <div class="kpi-cards" style="display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap;">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Conversion Rate</div>
+                            <div class="kpi-value" id="kpiConversionRate">--%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Pipeline Velocity</div>
+                            <div class="kpi-value" id="kpiPipelineVelocity">--</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">SDR Performance</div>
+                            <div class="kpi-value" id="kpiSDRPerformance">--</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--space-24);">
+                        <div class="card">
+                            <div class="card__body">
+                                <!-- Chart.js will render here -->
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__body">
+                                <!-- Chart.js will render here -->
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__body">
+                                <!-- Chart.js will render here -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Custom Reports Section -->
+                    <div class="card" style="margin-top:32px;">
+                        <div class="card__body">
+                            <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Custom Reports & Export</h3>
+                            <form id="customReportForm" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+                                <label><input type="checkbox" name="fields" value="contact" checked> Contact</label>
+                                <label><input type="checkbox" name="fields" value="company" checked> Company</label>
+                                <label><input type="checkbox" name="fields" value="title" checked> Title</label>
+                                <label><input type="checkbox" name="fields" value="industry"> Industry</label>
+                                <label><input type="checkbox" name="fields" value="companySize"> Company Size</label>
+                                <label><input type="checkbox" name="fields" value="intentScore"> Intent Score</label>
+                                <label><input type="checkbox" name="fields" value="email"> Email</label>
+                                <label><input type="checkbox" name="fields" value="website"> Website</label>
+                                <button type="submit" class="btn btn--primary">Export CSV</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settingsView" class="content-view hidden">
+                <div style="padding: var(--space-32);">
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-24);">Account Settings</h2>
+                    <div class="card" style="margin-bottom: var(--space-24);">
+                        <div class="card__body">
+                            <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Profile Information</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-16);">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" id="name" class="form-control" value="John Smith">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-control" value="john.smith@example.com">
+                                </div>
+                            </div>
+                            <button class="btn btn--primary" style="margin-top: var(--space-16);">Save Profile</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card__body">
+                            <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Notification Preferences</h3>
+                            <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+                                <div style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="email-notifications" style="margin: 0;">
+                                    <label for="email-notifications" style="color: var(--color-text); margin: 0;">Email Notifications</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: var(--space-8);">
+                                    <input type="checkbox" id="inapp-notifications" checked style="margin: 0;">
+                                    <label for="inapp-notifications" style="color: var(--color-text); margin: 0;">In-App Notifications</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Leads View -->
+            <div id="importLeadsView" class="content-view hidden import-leads-bg">
+                <div style="width:100%; max-width: 420px; margin: auto;">
+                    <div class="card" style="box-shadow:0 4px 24px rgba(31,184,205,0.08); border-radius: 18px; padding: 32px 32px 24px 32px; text-align: center;">
+                        <div style="margin-bottom: 18px; position:relative;">
+                            <span style="display:inline-block;width:48px;height:48px;opacity:0.85;vertical-align:middle;">
+                                <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CSV Icon">
+                                    <rect width="48" height="48" rx="10" fill="#E6F4F1"/>
+                                    <rect x="12" y="14" width="24" height="20" rx="3" fill="#1FB8CD"/>
+                                    <rect x="15" y="18" width="18" height="3" rx="1.5" fill="#fff"/>
+                                    <rect x="15" y="24" width="18" height="3" rx="1.5" fill="#fff"/>
+                                    <text x="24" y="38" text-anchor="middle" font-size="10" fill="#185a63" font-family="Arial, sans-serif" font-weight="bold">CSV</text>
+                                </svg>
+                            </span>
+                        </div>
+                        <h2 style="font-size: 2rem; font-weight: 700; color: #185a63; margin-bottom: 8px;">Import Leads</h2>
+                        <p style="color: #4a5a5a; font-size: 1rem; margin-bottom: 24px;">Upload a CSV file to quickly add and score new leads.</p>
+                        <form id="importForm">
+                            <label for="leadsFile" class="form-label" style="font-weight:600; color:#185a63;">Upload CSV File</label>
+                            <input type="file" id="leadsFile" accept=".csv" class="form-control" required style="margin: 12px auto 24px auto; display: block; max-width: 260px; background: #f7fafc; border: 1.5px solid #e0e6e6; border-radius: 8px; padding: 8px; cursor:pointer;">
+                            <div id="importProgressBar" class="hidden" style="width:100%;background:#e0e6e6;border-radius:8px;height:18px;margin-bottom:18px;overflow:hidden;">
+                                <div id="importProgress" style="height:100%;width:0%;background:#1fb8cd;transition:width 0.3s;"></div>
+                            </div>
+                            <div id="mappingSection" class="card hidden" style="margin-bottom: var(--space-24); text-align:left; background: #f8fafb; border-radius: 12px; box-shadow: none;">
+                                <div class="card__body">
+                                    <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Map Columns</h3>
+                                    <div id="mappingFields"></div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn--primary hidden" id="submitImportBtn" style="width:100%;margin-top:12px;">Import Leads</button>
+                        </form>
+                        <div id="importStatus" style="margin-top: 18px; min-height: 24px;display:none;"></div>
+                        <!-- Success Modal -->
+                        <div id="importSuccessModal" class="modal hidden" tabindex="-1" role="dialog" aria-modal="true" style="display:none;">
+                            <div class="modal-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(24,90,99,0.18);z-index:1001;"></div>
+                            <div class="modal-content" style="max-width:340px;text-align:center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 8px 32px rgba(31,184,205,0.18); border-radius: 16px; background: #fff; z-index: 1002;">
+                        <style>
+                        /* Ensure modal is centered within the card, not viewport */
+                        #importLeadsView .card { position: relative; }
+                        #importSuccessModal.modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+                        #importSuccessModal .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+                        #importSuccessModal .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+                        </style>    
+                                <div style="font-size:48px;color:#1fb8cd;margin-bottom:12px;">✔️</div>
+                                <h3 style="margin-bottom:8px;">Import Successful!</h3>
+                                <div id="importSuccessMsg" style="margin-bottom:18px;"></div>
+                                <button id="closeImportSuccess" class="btn btn--primary" style="width:100%;">OK</button>
+                            </div>
+                        </div>
+    <script>
+    // Import Progress and Success Modal Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        var importStatus = document.getElementById('importStatus');
+        var importProgressBar = document.getElementById('importProgressBar');
+        var importProgress = document.getElementById('importProgress');
+        var importSuccessModal = document.getElementById('importSuccessModal');
+        var importSuccessMsg = document.getElementById('importSuccessMsg');
+        var closeImportSuccess = document.getElementById('closeImportSuccess');
+        // Patch app.js import logic to show progress and modal
+        if (window.leadsFileInput) {
+            window.leadsFileInput.addEventListener('change', function() {
+                if (importProgressBar) { importProgressBar.classList.add('hidden'); importProgress.style.width = '0%'; }
+                if (importStatus) { importStatus.style.display = 'none'; importStatus.textContent = ''; }
+            });
+        }
+        // Listen for custom events from app.js
+        window.showImportProgress = function(percent) {
+            if (importProgressBar && importProgress) {
+                importProgressBar.classList.remove('hidden');
+                importProgress.style.width = percent + '%';
+            }
+        };
+        window.hideImportProgress = function() {
+            if (importProgressBar) importProgressBar.classList.add('hidden');
+            if (importProgress) importProgress.style.width = '0%';
+        };
+        window.showImportSuccess = function(msg) {
+            if (importSuccessModal && importSuccessMsg) {
+                importSuccessMsg.textContent = msg;
+                importSuccessModal.style.display = 'block';
+                importSuccessModal.classList.remove('hidden');
+                setTimeout(function(){
+                    importSuccessModal.focus();
+                }, 100);
+            }
+        };
+        if (closeImportSuccess) {
+            closeImportSuccess.addEventListener('click', function() {
+                if (importSuccessModal) {
+                    importSuccessModal.style.display = 'none';
+                    importSuccessModal.classList.add('hidden');
+                }
+            });
+        }
+    });
+    </script>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Reasoning Modal -->
+    <div id="reasoningModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Lead Score Reasoning</h3>
+                <button class="modal-close" id="closeModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="reasoning-lead-info">
+                    <div class="reasoning-avatar" id="reasoningAvatar"></div>
+                    <div class="reasoning-details">
+                        <h4 id="reasoningLeadName"></h4>
+                        <p id="reasoningCompany"></p>
+                    </div>
+                    <div class="reasoning-score">
+                        <div class="score-value" id="reasoningScore"></div>
+                        <div class="score-label">Intent Score</div>
+                    </div>
+                </div>
+                <div class="reasoning-content">
+                    <h5>Why this score?</h5>
+                    <p id="reasoningText"></p>
+                    <div class="key-factors">
+                        <h6>Key Factors:</h6>
+                        <ul id="reasoningInsights"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="chatbot.js"></script>
+    <script>
+    // Alert bar logic (simple placeholder, real logic in app.js)
+    window.showAlert = function(msg, type = 'info') {
+        const bar = document.getElementById('alertBar');
+        if (!bar) return;
+        bar.textContent = msg;
+        bar.style.display = 'block';
+        bar.style.background = type === 'error' ? '#db4545' : (type === 'success' ? '#1fb8cd' : '#ffc185');
+        bar.style.color = '#fff';
+        setTimeout(() => { bar.style.display = 'none'; }, 5000);
+    };
+
+    // Custom Report Export: Prevent refresh and export CSV
+    document.addEventListener('DOMContentLoaded', function() {
+      var form = document.getElementById('customReportForm');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var checked = Array.from(form.querySelectorAll('input[type="checkbox"][name="fields"]:checked')).map(cb => cb.value);
+          if (!checked.length) {
+            window.showAlert('Please select at least one field to export.', 'error');
+            return;
+          }
+          var leads = window.filteredLeads || window.leadsData || [];
+          if (!leads.length) {
+            window.showAlert('No leads to export.', 'error');
+            return;
+          }
+          var csv = '';
+          csv += checked.join(',') + '\n';
+          leads.forEach(function(lead) {
+            var row = checked.map(f => {
+              var val = lead[f] !== undefined ? lead[f] : '';
+              // Escape quotes and commas
+              if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+                val = '"' + val.replace(/"/g, '""') + '"';
+              }
+              return val;
+            });
+            csv += row.join(',') + '\n';
+          });
+          var blob = new Blob([csv], {type: 'text/csv'});
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'leadconnect_report.csv';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function() {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+          window.showAlert('Report exported!', 'success');
+        });
+      }
+    });
+    </script>
+</body>
+</html>
