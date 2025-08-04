@@ -241,6 +241,9 @@ function getCompanyLogo(company, website) {
     return null;
 }
 function getCompanyInitials(companyName) {
+    if (!companyName || typeof companyName !== 'string' || !companyName.trim()) {
+        return '--'; // fallback initials
+    }
     return companyName.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
 }
 
@@ -1004,11 +1007,7 @@ function generateFallbackScore(lead) {
     };
 }
 
-const leadsFileInput = document.getElementById('leadsFile');
-const mappingSection = document.getElementById('mappingSection');
-const mappingFields = document.getElementById('mappingFields');
-const submitImportBtn = document.getElementById('submitImportBtn');
-const importStatus = document.getElementById('importStatus');
+// Import functionality - all handled in initializeImportForm()
 let importedCSVData = [];
 let csvHeaders = [];
 
@@ -1061,55 +1060,7 @@ function parseCSV(text) {
     return { headers, data };
 }
 
-if (leadsFileInput) {
-    leadsFileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (!file) return;
-        
-        const mappingSection = document.getElementById('mappingSection');
-        const submitImportBtn = document.getElementById('submitImportBtn');
-        const importStatus = document.getElementById('importStatus');
-        const leadsContainer = document.getElementById('leadsContainer');
-        const leadCountElement = document.getElementById('leadCount');
-        
-        // Show loader
-        if (mappingSection) mappingSection.classList.add('hidden');
-        if (submitImportBtn) submitImportBtn.classList.add('hidden');
-        if (importStatus) importStatus.textContent = 'Reading file...';
-        if (leadsContainer) {
-            leadsContainer.dataset.loading = 'true';
-            renderLeads(leadsContainer, [], leadCountElement);
-        }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const { headers, data } = parseCSV(e.target.result);
-                csvHeaders = headers;
-                importedCSVData = data;
-                showMappingFields(headers);
-                if (importStatus) importStatus.textContent = `File loaded successfully. Found ${data.length} rows.`;
-                if (leadsContainer) {
-                    delete leadsContainer.dataset.loading;
-                    renderLeads(leadsContainer, filteredLeads, leadCountElement);
-                }
-            } catch (err) {
-                if (leadsContainer) {
-                    delete leadsContainer.dataset.loading;
-                    renderLeads(leadsContainer, filteredLeads, leadCountElement);
-                }
-                if (importStatus) importStatus.textContent = 'Error parsing CSV: ' + (err.message || err);
-            }
-        };
-        reader.onerror = function(e) {
-            if (leadsContainer) {
-                delete leadsContainer.dataset.loading;
-                renderLeads(leadsContainer, filteredLeads, leadCountElement);
-            }
-            if (importStatus) importStatus.textContent = 'Error reading file.';
-        };
-        reader.readAsText(file);
-    });
-}
+// File input handling moved to initializeImportForm()
 
 function showMappingFields(headers) {
     const mappingSection = document.getElementById('mappingSection');
@@ -1128,12 +1079,38 @@ function showMappingFields(headers) {
         const select = document.createElement('select');
         select.className = 'form-control';
         select.required = true;
-        select.innerHTML = `<option value="">Select column for "${field.label}"</option>` +
-            headers.map(h => `<option value="${h}">${h}</option>`).join('');
         select.dataset.fieldKey = field.key;
+        select.name = field.key; // Add name attribute for accessibility
+        select.disabled = false; // Ensure dropdown is enabled
+        // Improved auto-mapping logic for 'Contact Name'
+        let normalizedFieldKey = field.key.trim().toLowerCase().replace(/[_\- ]+/g, '');
+        let normalizedFieldLabel = field.label.trim().toLowerCase().replace(/[_\- ]+/g, '');
+        let autoMatchIdx = -1;
+        headers.forEach((h, idx) => {
+            let normalizedHeader = h.trim().toLowerCase().replace(/[_\- ]+/g, '');
+            // For 'contact', match 'contact', 'contactname', 'contact name'
+            if (normalizedFieldKey === 'contact') {
+                if (normalizedHeader === 'contact' || normalizedHeader === 'contactname' || normalizedHeader === 'contactname') autoMatchIdx = idx;
+            } else if (normalizedHeader === normalizedFieldKey || normalizedHeader === normalizedFieldLabel) {
+                autoMatchIdx = idx;
+            }
+        });
+        // Fallback: if no match, select first header
+        if (autoMatchIdx === -1) autoMatchIdx = 0;
+        select.innerHTML = `<option value="">Select column for "${field.label}"</option>` +
+            headers.map((h, idx) => `<option value="${h}"${autoMatchIdx === idx ? ' selected' : ''}>${h}</option>`).join('');
+        // Add change event to update mapping immediately
+        select.addEventListener('change', function() {
+            console.log(`[Copilot Import Debug] Mapping dropdown changed: fieldKey=${field.key}, value=${this.value}`);
+        });
         group.appendChild(label);
         group.appendChild(select);
         mappingFields.appendChild(group);
+    });
+    // Log dropdown interactivity for debugging
+    const allSelects = mappingFields.querySelectorAll('select');
+    allSelects.forEach((sel, idx) => {
+        console.log(`[Copilot Import Debug] Mapping dropdown ${idx + 1}: enabled=${!sel.disabled}, name=${sel.name}, value=${sel.value}`);
     });
     if (mappingSection) mappingSection.classList.remove('hidden');
     if (submitImportBtn) submitImportBtn.classList.remove('hidden');
@@ -1148,9 +1125,56 @@ function initializeImportForm() {
     const importStatus = document.getElementById('importStatus');
     const leadsContainer = document.getElementById('leadsContainer');
     const leadCountElement = document.getElementById('leadCount');
+    const leadsFileInput = document.getElementById('leadsFile');
     
     if (!importForm) return;
     
+    // File input handler
+    if (leadsFileInput) {
+        leadsFileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            
+            // Show loader
+            if (mappingSection) mappingSection.classList.add('hidden');
+            if (submitImportBtn) submitImportBtn.classList.add('hidden');
+            if (importStatus) importStatus.textContent = 'Reading file...';
+            if (leadsContainer) {
+                leadsContainer.dataset.loading = 'true';
+                renderLeads(leadsContainer, [], leadCountElement);
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const { headers, data } = parseCSV(e.target.result);
+                    csvHeaders = headers;
+                    importedCSVData = data;
+                    showMappingFields(headers);
+                    if (importStatus) importStatus.textContent = `File loaded successfully. Found ${data.length} rows.`;
+                    if (leadsContainer) {
+                        delete leadsContainer.dataset.loading;
+                        renderLeads(leadsContainer, filteredLeads, leadCountElement);
+                    }
+                } catch (err) {
+                    if (leadsContainer) {
+                        delete leadsContainer.dataset.loading;
+                        renderLeads(leadsContainer, filteredLeads, leadCountElement);
+                    }
+                    if (importStatus) importStatus.textContent = 'Error parsing CSV: ' + (err.message || err);
+                }
+            };
+            reader.onerror = function(e) {
+                if (leadsContainer) {
+                    delete leadsContainer.dataset.loading;
+                    renderLeads(leadsContainer, filteredLeads, leadCountElement);
+                }
+                if (importStatus) importStatus.textContent = 'Error reading file.';
+            };
+            reader.readAsText(file);
+        });
+    }
+    
+    // Form submit handler
     importForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -1160,19 +1184,35 @@ function initializeImportForm() {
         }
         
         const selects = mappingFields.querySelectorAll('select');
+        console.log(`[Copilot Import Debug] Found ${selects.length} mapping dropdowns in import form.`);
+        selects.forEach((sel, idx) => {
+            console.log(`[Copilot Import Debug] Import mapping dropdown ${idx + 1}: fieldKey=${sel.dataset.fieldKey}, value=${sel.value}`);
+        });
         const mapping = {};
         selects.forEach(sel => {
             mapping[sel.dataset.fieldKey] = sel.value;
         });
-        
-        if (Object.values(mapping).some(v => !v)) {
-            if (importStatus) importStatus.textContent = 'Please map all required fields.';
+        console.log('[Copilot Import Debug] Mapping built from dropdowns:', mapping);
+        if (selects.length === 0) {
+            if (importStatus) importStatus.textContent = 'No mapping dropdowns found. Please reload the page and try again.';
+            console.warn('[Copilot Import Debug] Import prevented: no mapping dropdowns found.');
             return;
         }
-        
+
+        if (Object.values(mapping).some(v => !v)) {
+            if (importStatus) importStatus.textContent = 'Please map all required fields.';
+            console.warn('[Copilot Import Debug] Import prevented: not all required fields mapped.', mapping);
+            return;
+        }
+        if (Object.keys(mapping).length === 0) {
+            if (importStatus) importStatus.textContent = 'No mapping found. Please select columns for all fields.';
+            console.warn('[Copilot Import Debug] Import prevented: mapping object is empty.', mapping);
+            return;
+        }
+
         // Clear any previous status
         if (importStatus) importStatus.textContent = 'Processing leads...';
-        
+
         // Show loader
         if (leadsContainer) {
             leadsContainer.dataset.loading = 'true';
@@ -1192,28 +1232,78 @@ function initializeImportForm() {
 
             // Prepare all lead objects first
             const allLeadObjs = importedCSVData.map((row, idx) => {
-                const pageViews = parseInt(row[mapping.pageViews] || '0', 10);
-                const downloads = parseInt(row[mapping.downloads] || '0', 10);
-                const webinar = (row[mapping.webinarAttended] || '').toLowerCase() === 'yes';
+                // Improved value extraction: normalize mapping and fallback to original header
+                if (idx === 0) {
+                    console.log('[Copilot Import Debug] Mapping used for import:', mapping);
+                }
+                const getVal = key => {
+                    let mapped = mapping[key];
+                    let value = '';
+                    if (!mapped) {
+                        console.log(`[Copilot Import Debug] Row ${idx + 1}: No mapping for key '${key}'`);
+                        return '';
+                    }
+                    // Try exact match
+                    if (row[mapped] !== undefined && row[mapped] !== '') {
+                        value = row[mapped];
+                        console.log(`[Copilot Import Debug] Row ${idx + 1}: key='${key}', mapped='${mapped}', value='${value}' (exact match)`);
+                        return value;
+                    }
+                    // Try normalized match (ignore case and spaces)
+                    const normalizedMapped = mapped.trim().toLowerCase().replace(/[_\- ]+/g, '');
+                    for (const h of Object.keys(row)) {
+                        if (h.trim().toLowerCase().replace(/[_\- ]+/g, '') === normalizedMapped && row[h] !== '') {
+                            value = row[h];
+                            console.log(`[Copilot Import Debug] Row ${idx + 1}: key='${key}', mapped='${mapped}', value='${value}' (normalized match with header '${h}')`);
+                            return value;
+                        }
+                    }
+                    // Fallback: try first non-empty value in row
+                    for (const h of Object.keys(row)) {
+                        if (row[h] !== '') {
+                            value = row[h];
+                            console.log(`[Copilot Import Debug] Row ${idx + 1}: key='${key}', mapped='${mapped}', value='${value}' (fallback to first non-empty header '${h}')`);
+                            return value;
+                        }
+                    }
+                    console.log(`[Copilot Import Debug] Row ${idx + 1}: key='${key}', mapped='${mapped}', value='' (no value found)`);
+                    return '';
+                };
+                const pageViews = parseInt(getVal('pageViews') || '0', 10);
+                const downloads = parseInt(getVal('downloads') || '0', 10);
+                const webinar = (getVal('webinarAttended') || '').toLowerCase() === 'yes';
                 const INDUSTRY_OPTIONS = [
                     'Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Education', 'Retail', 'Energy'
                 ];
                 const SIZE_OPTIONS = [
                     'Enterprise', 'Mid-Market', 'Small Business'
                 ];
-                let rawIndustry = row[mapping.industry] || '';
+                let rawIndustry = getVal('industry') || '';
                 let normIndustry = INDUSTRY_OPTIONS.find(opt => opt.toLowerCase() === rawIndustry.trim().toLowerCase()) || rawIndustry.trim();
-                let rawSize = row[mapping.companySize] || '';
+                let rawSize = getVal('companySize') || '';
                 let normSize = SIZE_OPTIONS.find(opt => opt.toLowerCase() === rawSize.trim().toLowerCase()) || rawSize.trim();
-                return {
-                    id: leadsData.length + idx + 1,
-                    contact: row[mapping.contact],
-                    company: row[mapping.company],
-                    title: row[mapping.title],
+                // Log all extracted values for this row
+                console.log(`[Copilot Import Debug] Row ${idx + 1} extracted:`, {
+                    contact: getVal('contact'),
+                    company: getVal('company'),
+                    title: getVal('title'),
                     industry: normIndustry,
                     companySize: normSize,
-                    email: row[mapping.email],
-                    website: row[mapping.website],
+                    email: getVal('email'),
+                    website: getVal('website'),
+                    pageViews,
+                    downloads,
+                    webinarAttended: webinar
+                });
+                return {
+                    id: leadsData.length + idx + 1,
+                    contact: getVal('contact'),
+                    company: getVal('company'),
+                    title: getVal('title'),
+                    industry: normIndustry,
+                    companySize: normSize,
+                    email: getVal('email'),
+                    website: getVal('website'),
                     pageViews,
                     downloads,
                     webinarAttended: webinar
