@@ -277,102 +277,25 @@
             </div>
 
             <!-- Import Leads View -->
-            <div id="importLeadsView" class="content-view hidden import-leads-bg">
-                <div style="width:100%; max-width: 420px; margin: auto;">
-                    <div class="card" style="box-shadow:0 4px 24px rgba(31,184,205,0.08); border-radius: 18px; padding: 32px 32px 24px 32px; text-align: center;">
-                        <div style="margin-bottom: 18px; position:relative;">
-                            <span style="display:inline-block;width:48px;height:48px;opacity:0.85;vertical-align:middle;">
-                                <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CSV Icon">
-                                    <rect width="48" height="48" rx="10" fill="#E6F4F1"/>
-                                    <rect x="12" y="14" width="24" height="20" rx="3" fill="#1FB8CD"/>
-                                    <rect x="15" y="18" width="18" height="3" rx="1.5" fill="#fff"/>
-                                    <rect x="15" y="24" width="18" height="3" rx="1.5" fill="#fff"/>
-                                    <text x="24" y="38" text-anchor="middle" font-size="10" fill="#185a63" font-family="Arial, sans-serif" font-weight="bold">CSV</text>
-                                </svg>
-                            </span>
-                        </div>
-                        <h2 style="font-size: 2rem; font-weight: 700; color: #185a63; margin-bottom: 8px;">Import Leads</h2>
-                        <p style="color: #4a5a5a; font-size: 1rem; margin-bottom: 24px;">Upload a CSV file to quickly add and score new leads.</p>
-                        <form id="importForm">
-                            <label for="leadsFile" class="form-label" style="font-weight:600; color:#185a63;">Upload CSV File</label>
-                            <input type="file" id="leadsFile" accept=".csv" class="form-control" required style="margin: 12px auto 24px auto; display: block; max-width: 260px; background: #f7fafc; border: 1.5px solid #e0e6e6; border-radius: 8px; padding: 8px; cursor:pointer;">
-                            <div id="importProgressBar" class="hidden" style="width:100%;background:#e0e6e6;border-radius:8px;height:18px;margin-bottom:18px;overflow:hidden;">
-                                <div id="importProgress" style="height:100%;width:0%;background:#1fb8cd;transition:width 0.3s;"></div>
-                            </div>
-                            <div id="mappingSection" class="card hidden" style="margin-bottom: var(--space-24); text-align:left; background: #f8fafb; border-radius: 12px; box-shadow: none;">
-                                <div class="card__body">
-                                    <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Map Columns</h3>
-                                    <div id="mappingFields"></div>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn--primary hidden" id="submitImportBtn" style="width:100%;margin-top:12px;">Import Leads</button>
-                        </form>
-                        <div id="importStatus" style="margin-top: 18px; min-height: 24px;display:none;"></div>
-                        <!-- Success Modal -->
-                        <div id="importSuccessModal" class="modal hidden" tabindex="-1" role="dialog" aria-modal="true" style="display:none;">
-                            <div class="modal-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(24,90,99,0.18);z-index:1001;"></div>
-                            <div class="modal-content" style="max-width:340px;text-align:center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 8px 32px rgba(31,184,205,0.18); border-radius: 16px; background: #fff; z-index: 1002;">
-                        <style>
-                        /* Ensure modal is centered within the card, not viewport */
-                        #importLeadsView .card { position: relative; }
-                        #importSuccessModal.modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-                        #importSuccessModal .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-                        #importSuccessModal .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-                        </style>    
-                                <div style="font-size:48px;color:#1fb8cd;margin-bottom:12px;">✔️</div>
-                                <h3 style="margin-bottom:8px;">Import Successful!</h3>
-                                <div id="importSuccessMsg" style="margin-bottom:18px;"></div>
-                                <button id="closeImportSuccess" class="btn btn--primary" style="width:100%;">OK</button>
+            <div id="importLeadsView" class="content-view hidden">
+                <div style="padding: var(--space-32); max-width: 600px; margin: auto;">
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-24);">Import Leads</h2>
+                    <form id="importForm">
+                        <div class="card" style="margin-bottom: var(--space-24);">
+                            <div class="card__body">
+                                <label for="leadsFile" class="form-label">Upload CSV File</label>
+                                <input type="file" id="leadsFile" accept=".csv" class="form-control" required>
                             </div>
                         </div>
-    <script>
-    // Import Progress and Success Modal Logic
-    document.addEventListener('DOMContentLoaded', function() {
-        var importStatus = document.getElementById('importStatus');
-        var importProgressBar = document.getElementById('importProgressBar');
-        var importProgress = document.getElementById('importProgress');
-        var importSuccessModal = document.getElementById('importSuccessModal');
-        var importSuccessMsg = document.getElementById('importSuccessMsg');
-        var closeImportSuccess = document.getElementById('closeImportSuccess');
-        // Patch app.js import logic to show progress and modal
-        if (window.leadsFileInput) {
-            window.leadsFileInput.addEventListener('change', function() {
-                if (importProgressBar) { importProgressBar.classList.add('hidden'); importProgress.style.width = '0%'; }
-                if (importStatus) { importStatus.style.display = 'none'; importStatus.textContent = ''; }
-            });
-        }
-        // Listen for custom events from app.js
-        window.showImportProgress = function(percent) {
-            if (importProgressBar && importProgress) {
-                importProgressBar.classList.remove('hidden');
-                importProgress.style.width = percent + '%';
-            }
-        };
-        window.hideImportProgress = function() {
-            if (importProgressBar) importProgressBar.classList.add('hidden');
-            if (importProgress) importProgress.style.width = '0%';
-        };
-        window.showImportSuccess = function(msg) {
-            if (importSuccessModal && importSuccessMsg) {
-                importSuccessMsg.textContent = msg;
-                importSuccessModal.style.display = 'block';
-                importSuccessModal.classList.remove('hidden');
-                setTimeout(function(){
-                    importSuccessModal.focus();
-                }, 100);
-            }
-        };
-        if (closeImportSuccess) {
-            closeImportSuccess.addEventListener('click', function() {
-                if (importSuccessModal) {
-                    importSuccessModal.style.display = 'none';
-                    importSuccessModal.classList.add('hidden');
-                }
-            });
-        }
-    });
-    </script>
-                    </div>
+                        <div id="mappingSection" class="card hidden" style="margin-bottom: var(--space-24);">
+                            <div class="card__body">
+                                <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin-bottom: var(--space-16);">Map Columns</h3>
+                                <div id="mappingFields"></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn--primary hidden" id="submitImportBtn">Import Leads</button>
+                    </form>
+                    <div id="importStatus" style="margin-top: var(--space-16);"></div>
                 </div>
             </div>
         </main>

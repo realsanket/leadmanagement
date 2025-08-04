@@ -104,26 +104,104 @@ function renderAnalytics() {
 }
 window.renderAnalytics = renderAnalytics;
 // Lead data from the provided JSON
-// Load leadsData from localStorage if available, otherwise use default
-let defaultLeadsData = [
-    {"id":1,"company":"TechFlow Solutions","contact":"Sarah Chen","title":"VP of Engineering","intentScore":92,"industry":"Technology","companySize":"Mid-Market","insights":["Visited pricing page 4 times","Downloaded ROI calculator","Attended webinar on AI integration"],"recommendedAction":"Schedule executive demo - Focus on ROI and integration capabilities","reasoning":"High engagement across multiple touchpoints. Downloaded ROI calculator indicates budget consideration phase. Multiple pricing page visits suggest near-term decision timeline."},
-    {"id":2,"company":"MedCore Healthcare","contact":"Dr. Michael Rodriguez","title":"Chief Technology Officer","intentScore":88,"industry":"Healthcare","companySize":"Enterprise","insights":["Researched HIPAA compliance features","Downloaded security whitepaper","Engaged with compliance-focused email campaign"],"recommendedAction":"Send healthcare compliance case study and schedule security review","reasoning":"Strong focus on compliance and security indicates serious evaluation. Healthcare industry expertise and enterprise size suggest high-value opportunity."},
-    {"id":3,"company":"GreenEnergy Dynamics","contact":"Lisa Park","title":"Operations Director","intentScore":76,"industry":"Energy","companySize":"Mid-Market","insights":["Viewed competitor comparison page","Downloaded sustainability report","Recent company expansion announcement"],"recommendedAction":"Follow up with sustainability-focused value proposition","reasoning":"Competitor research indicates active evaluation phase. Sustainability focus aligns with company values and recent expansion suggests growth capital availability."},
-    {"id":4,"company":"FinTech Innovations","contact":"James Wilson","title":"Head of Digital Transformation","intentScore":85,"industry":"Finance","companySize":"Enterprise","insights":["Multiple team members viewed product pages","Downloaded integration guide","Requested custom demo"],"recommendedAction":"Prepare comprehensive demo focusing on financial services integration","reasoning":"Multi-stakeholder engagement and custom demo request indicate high intent. Financial services background requires specialized approach and compliance focus."},
-    {"id":5,"company":"LogiCorp Manufacturing","contact":"Robert Thompson","title":"IT Director","intentScore":67,"industry":"Manufacturing","companySize":"Enterprise","insights":["Attended industry webinar","Downloaded manufacturing case study","Recently posted job openings for data analysts"],"recommendedAction":"Send manufacturing-specific ROI analysis and schedule discovery call","reasoning":"Industry-specific content engagement and new data analyst hires suggest data modernization initiative. Manufacturing focus requires operational efficiency messaging."},
-    {"id":6,"company":"EduTech Academy","contact":"Amanda Foster","title":"Technology Integration Specialist","intentScore":58,"industry":"Education","companySize":"Small Business","insights":["Viewed education pricing tier","Downloaded getting started guide","Shared content on LinkedIn"],"recommendedAction":"Follow up via LinkedIn with education sector success stories","reasoning":"Education-focused engagement and social sharing indicate interest but budget constraints likely. Small business segment requires value-focused approach."},
-    {"id":7,"company":"RetailMax Solutions","contact":"Kevin Chang","title":"Chief Information Officer","intentScore":91,"industry":"Retail","companySize":"Enterprise","insights":["Requested technical architecture review","Downloaded API documentation","Multiple C-level executives engaged"],"recommendedAction":"Schedule technical deep-dive with architecture team","reasoning":"Technical architecture focus and C-level engagement indicate advanced evaluation stage. Enterprise retail requires scalability and performance emphasis."}
-];
+// Load leads from localStorage if available
 let leadsData = [];
+const LOCAL_STORAGE_KEY = 'leadconnect_leads';
 try {
-    const stored = localStorage.getItem('leadsData');
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (stored) {
         leadsData = JSON.parse(stored);
     } else {
-        leadsData = defaultLeadsData;
+        leadsData = [
+            // ...existing code for default sample leads...
+            {
+                "id": 1,
+                "company": "TechFlow Solutions",
+                "contact": "Sarah Chen",
+                "title": "VP of Engineering",
+                "intentScore": 92,
+                "industry": "Technology",
+                "companySize": "Mid-Market",
+                "insights": ["Visited pricing page 4 times", "Downloaded ROI calculator", "Attended webinar on AI integration"],
+                "recommendedAction": "Schedule executive demo - Focus on ROI and integration capabilities",
+                "reasoning": "High engagement across multiple touchpoints. Downloaded ROI calculator indicates budget consideration phase. Multiple pricing page visits suggest near-term decision timeline."
+            },
+            {
+                "id": 2,
+                "company": "MedCore Healthcare",
+                "contact": "Dr. Michael Rodriguez",
+                "title": "Chief Technology Officer",
+                "intentScore": 88,
+                "industry": "Healthcare",
+                "companySize": "Enterprise",
+                "insights": ["Researched HIPAA compliance features", "Downloaded security whitepaper", "Engaged with compliance-focused email campaign"],
+                "recommendedAction": "Send healthcare compliance case study and schedule security review",
+                "reasoning": "Strong focus on compliance and security indicates serious evaluation. Healthcare industry expertise and enterprise size suggest high-value opportunity."
+            },
+            {
+                "id": 3,
+                "company": "GreenEnergy Dynamics",
+                "contact": "Lisa Park",
+                "title": "Operations Director",
+                "intentScore": 76,
+                "industry": "Energy",
+                "companySize": "Mid-Market",
+                "insights": ["Viewed competitor comparison page", "Downloaded sustainability report", "Recent company expansion announcement"],
+                "recommendedAction": "Follow up with sustainability-focused value proposition",
+                "reasoning": "Competitor research indicates active evaluation phase. Sustainability focus aligns with company values and recent expansion suggests growth capital availability."
+            },
+            {
+                "id": 4,
+                "company": "FinTech Innovations",
+                "contact": "James Wilson",
+                "title": "Head of Digital Transformation",
+                "intentScore": 85,
+                "industry": "Finance",
+                "companySize": "Enterprise",
+                "insights": ["Multiple team members viewed product pages", "Downloaded integration guide", "Requested custom demo"],
+                "recommendedAction": "Prepare comprehensive demo focusing on financial services integration",
+                "reasoning": "Multi-stakeholder engagement and custom demo request indicate high intent. Financial services background requires specialized approach and compliance focus."
+            },
+            {
+                "id": 5,
+                "company": "LogiCorp Manufacturing",
+                "contact": "Robert Thompson",
+                "title": "IT Director",
+                "intentScore": 67,
+                "industry": "Manufacturing",
+                "companySize": "Enterprise",
+                "insights": ["Attended industry webinar", "Downloaded manufacturing case study", "Recently posted job openings for data analysts"],
+                "recommendedAction": "Send manufacturing-specific ROI analysis and schedule discovery call",
+                "reasoning": "Industry-specific content engagement and new data analyst hires suggest data modernization initiative. Manufacturing focus requires operational efficiency messaging."
+            },
+            {
+                "id": 6,
+                "company": "EduTech Academy",
+                "contact": "Amanda Foster",
+                "title": "Technology Integration Specialist",
+                "intentScore": 58,
+                "industry": "Education",
+                "companySize": "Small Business",
+                "insights": ["Viewed education pricing tier", "Downloaded getting started guide", "Shared content on LinkedIn"],
+                "recommendedAction": "Follow up via LinkedIn with education sector success stories",
+                "reasoning": "Education-focused engagement and social sharing indicate interest but budget constraints likely. Small business segment requires value-focused approach."
+            },
+            {
+                "id": 7,
+                "company": "RetailMax Solutions",
+                "contact": "Kevin Chang",
+                "title": "Chief Information Officer",
+                "intentScore": 91,
+                "industry": "Retail",
+                "companySize": "Enterprise",
+                "insights": ["Requested technical architecture review", "Downloaded API documentation", "Multiple C-level executives engaged"],
+                "recommendedAction": "Schedule technical deep-dive with architecture team",
+                "reasoning": "Technical architecture focus and C-level engagement indicate advanced evaluation stage. Enterprise retail requires scalability and performance emphasis."
+            }
+        ];
     }
 } catch (e) {
-    leadsData = defaultLeadsData;
+    leadsData = [];
 }
 
 // Company avatar colors
@@ -174,7 +252,7 @@ function createLeadCard(lead) {
     const scoreBadge = getScoreBadge(lead.intentScore);
     const avatarColor = getAvatarColor(lead.id);
     const companyInitials = getCompanyInitials(lead.company);
-    // Only show company initials, not logo
+    // Always show initials/abbreviation for all leads, never logo
     return `
         <div class="lead-card responsive-card" data-lead-id="${lead.id}" tabindex="0" role="region" aria-label="Lead card for ${lead.contact} at ${lead.company}">
             <div class="lead-header responsive-header">
@@ -241,8 +319,92 @@ function renderLeads(container, leads, countElement) {
             </div>
         `;
     } else if (isListView) {
-        // Render as table/list view (with responsive/professional design)
+        // Render as table/list view (with improved UI for delete button)
         container.innerHTML = `
+            <style>
+            .lead-list-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: #fff;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+                border-radius: 10px;
+                overflow: hidden;
+                font-size: 1em;
+            }
+            .lead-list-table thead th {
+                background: #f7f7fa;
+                color: #333;
+                font-weight: 600;
+                padding: 14px 10px;
+                border-bottom: 2px solid #e0e0e0;
+                text-align: left;
+                letter-spacing: 0.02em;
+            }
+            .lead-list-table tbody tr {
+                transition: background 0.2s;
+            }
+            .lead-list-table tbody tr:nth-child(even) {
+                background: #fafbfc;
+            }
+            .lead-list-table tbody tr:hover {
+                background: #eaf6fa;
+            }
+            .lead-list-table td {
+                padding: 12px 10px;
+                border-bottom: 1px solid #f0f0f0;
+                vertical-align: middle;
+            }
+            .lead-list-table td[data-label="Actions"] {
+                white-space: nowrap;
+            }
+            .delete-lead-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #fff;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                color: #db4545;
+                padding: 4px 8px;
+                margin-left: 10px;
+                font-size: 1.1em;
+                transition: background 0.2s, box-shadow 0.2s;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+                cursor: pointer;
+            }
+            .delete-lead-btn:hover, .delete-lead-btn:focus {
+                background: #ffeaea;
+                box-shadow: 0 2px 8px rgba(219,69,69,0.08);
+                outline: none;
+            }
+            .delete-lead-btn .icon {
+                margin-right: 4px;
+                font-size: 1.2em;
+            }
+            .reasoning-btn {
+                margin-right: 8px;
+                background: #f7f7fa;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                color: #1fb8cd;
+                padding: 4px 8px;
+                font-size: 1.1em;
+                transition: background 0.2s, box-shadow 0.2s;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+                cursor: pointer;
+            }
+            .reasoning-btn:hover, .reasoning-btn:focus {
+                background: #eaf6fa;
+                box-shadow: 0 2px 8px rgba(31,184,205,0.08);
+                outline: none;
+            }
+            .responsive-table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                padding: 0;
+            }
+            </style>
             <div class="responsive-table-wrapper">
             <table class="lead-list-table responsive-table" role="table" aria-label="Leads list">
                 <thead>
@@ -265,7 +427,14 @@ function renderLeads(container, leads, countElement) {
                             <td data-label="Industry">${lead.industry}</td>
                             <td data-label="Company Size">${lead.companySize}</td>
                             <td data-label="Intent Score"><span style="font-weight:600;color:${lead.intentScore>=85?'#1fb8cd':lead.intentScore>=60?'#e6a23c':'#db4545'}">${lead.intentScore}%</span></td>
-                            <td data-label="Actions"><button type="button" class="reasoning-btn" data-lead-id="${lead.id}" title="Why this score?" aria-label="Show reasoning for ${lead.contact} at ${lead.company}" tabindex="0">ℹ️</button></td>
+                            <td data-label="Actions">
+                                <span style="display:inline-flex;align-items:center;gap:8px;">
+                                    <button type="button" class="reasoning-btn" data-lead-id="${lead.id}" title="Why this score?" aria-label="Show reasoning for ${lead.contact} at ${lead.company}" tabindex="0">ℹ️</button>
+                                    <button type="button" class="delete-lead-btn" data-lead-id="${lead.id}" title="Delete lead" aria-label="Delete ${lead.contact} at ${lead.company}" tabindex="0">
+                                        <span class="icon">🗑️</span> <span class="label" style="font-size:0.95em;">Delete</span>
+                                    </button>
+                                </span>
+                            </td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -277,7 +446,7 @@ function renderLeads(container, leads, countElement) {
                 <button class="page-btn" ${virtualization.currentPage === totalPages - 1 ? 'disabled' : ''} data-page="next">Next</button>
             </div>` : ''}
         `;
-        // Add event listeners to reasoning buttons after rendering
+        // Add event listeners to reasoning and delete buttons after rendering
         setTimeout(() => {
             const reasoningButtons = container.querySelectorAll('.reasoning-btn');
             reasoningButtons.forEach(btn => {
@@ -286,6 +455,29 @@ function renderLeads(container, leads, countElement) {
                     e.stopPropagation();
                     const leadId = parseInt(this.dataset.leadId);
                     showReasoning(leadId);
+                });
+            });
+            // Delete button event listeners
+            const deleteButtons = container.querySelectorAll('.delete-lead-btn');
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const leadId = parseInt(this.dataset.leadId);
+                    if (confirm('Are you sure you want to delete this lead?')) {
+                        // Remove lead from leadsData
+                        leadsData = leadsData.filter(l => l.id !== leadId);
+                        hotLeads = leadsData.filter(l => l.intentScore >= 85);
+                        filteredLeads = filterLeads(searchInput ? searchInput.value.toLowerCase().trim() : '', intentFilter ? intentFilter.value : '', industryFilter ? industryFilter.value : '', sizeFilter ? sizeFilter.value : '', false);
+                        filteredHotLeads = filterLeads(hotSearchInput ? hotSearchInput.value.toLowerCase().trim() : '', '', hotIndustryFilter ? hotIndustryFilter.value : '', hotSizeFilter ? hotSizeFilter.value : '', true);
+                        try {
+                            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(leadsData));
+                        } catch (e) {}
+                        renderLeads(container, filteredLeads, countElement);
+                        updateHotLeadsView();
+                        if (typeof renderAnalytics === 'function') renderAnalytics();
+                        updateKPICards();
+                    }
                 });
             });
             // Pagination controls
@@ -468,25 +660,24 @@ function switchView(targetViewId) {
         view.classList.remove('active');
         view.classList.add('hidden');
     });
-    
     // Show target view
     const targetView = document.getElementById(targetViewId);
     if (targetView) {
         targetView.classList.remove('hidden');
         targetView.classList.add('active');
     }
-    
     // Update navigation active state
     const allNavItems = document.querySelectorAll('.nav-item');
     allNavItems.forEach(item => item.classList.remove('active'));
-    
     const activeNavLink = document.querySelector(`[data-target="${targetViewId}"]`);
     if (activeNavLink) {
         activeNavLink.closest('.nav-item').classList.add('active');
     }
-    
     currentView = targetViewId;
-    
+    // Persist current view in localStorage
+    try {
+        localStorage.setItem('leadconnect_currentView', currentView);
+    } catch (e) {}
     // Update view content based on the selected view
     if (targetViewId === 'allLeadsView') {
         updateAllLeadsView();
@@ -536,11 +727,29 @@ function initializeApp() {
     hotLeads = leadsData.filter(lead => lead.intentScore >= 85);
     filteredHotLeads = [...hotLeads];
     
-    // Initial render for All Leads view
-    updateAllLeadsView();
-    
-    // Initialize Hot Leads view data
-    updateHotLeadsView();
+    // Restore last view and tab from localStorage
+    let lastView = 'allLeadsView';
+    let lastTab = 'card';
+    try {
+        lastView = localStorage.getItem('leadconnect_currentView') || 'allLeadsView';
+        lastTab = localStorage.getItem('leadconnect_currentTab') || 'card';
+    } catch (e) {}
+    // Set active view
+    switchView(lastView);
+    // Set active tab (Card/List)
+    const viewButtons = document.querySelectorAll('.view-btn');
+    viewButtons.forEach(b => b.classList.remove('active'));
+    const tabBtn = document.querySelector(`.view-btn[data-view="${lastTab}"]`);
+    if (tabBtn) tabBtn.classList.add('active');
+    viewButtons.forEach(b => b.setAttribute('aria-pressed', b.classList.contains('active')));
+    // Initial render for views
+    if (lastView === 'allLeadsView') {
+        updateAllLeadsView();
+    } else if (lastView === 'hotLeadsView') {
+        updateHotLeadsView();
+    } else if (lastView === 'analyticsView') {
+        renderAnalytics();
+    }
     
     // Navigation event listeners - using event delegation on the sidebar
     const sidebar = document.querySelector('.sidebar-nav');
@@ -623,7 +832,6 @@ function initializeApp() {
     }
     
     // View controls (Card/List view toggle)
-    const viewButtons = document.querySelectorAll('.view-btn');
     viewButtons.forEach(btn => {
         btn.setAttribute('tabindex', '0');
         btn.setAttribute('role', 'button');
@@ -635,6 +843,10 @@ function initializeApp() {
             this.classList.add('active');
             // Update aria-pressed
             viewButtons.forEach(b => b.setAttribute('aria-pressed', b.classList.contains('active')));
+            // Persist current tab in localStorage
+            try {
+                localStorage.setItem('leadconnect_currentTab', this.dataset.view);
+            } catch (e) {}
             // Re-render leads in the new view mode
             if (currentView === 'allLeadsView') {
                 updateAllLeadsView();
@@ -650,6 +862,41 @@ function initializeApp() {
             }
         });
     });
+    // Add Clear button next to List view toggle
+    const listBtn = document.querySelector('.view-btn[data-view="list"]');
+    if (listBtn && !document.getElementById('clearLeadsBtn')) {
+        const clearBtn = document.createElement('button');
+        clearBtn.id = 'clearLeadsBtn';
+        clearBtn.className = 'view-btn';
+        clearBtn.setAttribute('data-view', 'clear');
+        clearBtn.innerHTML = `<span class="icon">🗑️</span> <span class="label">Clear</span>`;
+        clearBtn.title = 'Clear all leads';
+        clearBtn.style.marginLeft = '8px';
+        clearBtn.setAttribute('tabindex', '0');
+        clearBtn.setAttribute('aria-label', 'Clear all leads');
+        listBtn.parentNode.insertBefore(clearBtn, listBtn.nextSibling);
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all leads? This action cannot be undone.')) {
+                leadsData = [];
+                hotLeads = [];
+                filteredLeads = [];
+                filteredHotLeads = [];
+                try {
+                    localStorage.removeItem(LOCAL_STORAGE_KEY);
+                } catch (e) {}
+                updateAllLeadsView();
+                updateHotLeadsView();
+                if (typeof renderAnalytics === 'function') renderAnalytics();
+                updateKPICards();
+            }
+        });
+        clearBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                clearBtn.click();
+            }
+        });
+    }
     
     // Settings form functionality
     const saveProfileBtn = document.querySelector('#settingsView .btn--primary');
@@ -670,6 +917,13 @@ function initializeApp() {
             }
         }
     });
+    
+    // Initialize import form handler
+    const importForm = document.getElementById('importForm');
+    if (importForm && !importForm.hasAttribute('data-initialized')) {
+        importForm.setAttribute('data-initialized', 'true');
+        initializeImportForm();
+    }
 }
 
 // Wait for DOM to be fully loaded
@@ -701,12 +955,54 @@ window.getLeadScoreFromAPI = async function(lead) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('ML API error');
+        if (!res.ok) throw new Error(`ML API error: ${res.status}`);
         return await res.json();
     } catch (e) {
-        return { score: 0.5, explanation: [{ feature: 'API Error', impact: 0 }] };
+        console.warn('ML API unavailable, using fallback scoring:', e.message);
+        // Fallback scoring when API is unavailable
+        return generateFallbackScore(lead);
     }
 };
+
+// Fallback scoring function when ML API is unavailable
+function generateFallbackScore(lead) {
+    let score = 0.3; // Base score
+    
+    // Score based on engagement
+    if (lead.pageViews > 10) score += 0.2;
+    else if (lead.pageViews > 5) score += 0.1;
+    
+    if (lead.downloads > 2) score += 0.2;
+    else if (lead.downloads > 0) score += 0.1;
+    
+    if (lead.webinarAttended) score += 0.15;
+    
+    // Score based on company attributes
+    if (lead.companySize === 'Enterprise') score += 0.1;
+    else if (lead.companySize === 'Mid-Market') score += 0.05;
+    
+    // Industry scoring
+    const highValueIndustries = ['Technology', 'Finance', 'Healthcare'];
+    if (highValueIndustries.includes(lead.industry)) score += 0.1;
+    
+    // Title scoring
+    const seniorTitles = ['CEO', 'CTO', 'VP', 'Director', 'Manager'];
+    if (seniorTitles.some(title => lead.title.includes(title))) score += 0.1;
+    
+    // Cap at 1.0
+    score = Math.min(score, 1.0);
+    
+    return {
+        score: score,
+        explanation: [
+            { feature: 'Page Views', impact: lead.pageViews > 5 ? 0.1 : 0 },
+            { feature: 'Downloads', impact: lead.downloads > 0 ? 0.1 : 0 },
+            { feature: 'Webinar Attendance', impact: lead.webinarAttended ? 0.15 : 0 },
+            { feature: 'Company Size', impact: lead.companySize === 'Enterprise' ? 0.1 : 0.05 },
+            { feature: 'Industry', impact: highValueIndustries.includes(lead.industry) ? 0.1 : 0 }
+        ]
+    };
+}
 
 const leadsFileInput = document.getElementById('leadsFile');
 const mappingSection = document.getElementById('mappingSection');
@@ -769,10 +1065,17 @@ if (leadsFileInput) {
     leadsFileInput.addEventListener('change', function() {
         const file = this.files[0];
         if (!file) return;
+        
+        const mappingSection = document.getElementById('mappingSection');
+        const submitImportBtn = document.getElementById('submitImportBtn');
+        const importStatus = document.getElementById('importStatus');
+        const leadsContainer = document.getElementById('leadsContainer');
+        const leadCountElement = document.getElementById('leadCount');
+        
         // Show loader
         if (mappingSection) mappingSection.classList.add('hidden');
         if (submitImportBtn) submitImportBtn.classList.add('hidden');
-        if (importStatus) importStatus.textContent = '';
+        if (importStatus) importStatus.textContent = 'Reading file...';
         if (leadsContainer) {
             leadsContainer.dataset.loading = 'true';
             renderLeads(leadsContainer, [], leadCountElement);
@@ -784,6 +1087,7 @@ if (leadsFileInput) {
                 csvHeaders = headers;
                 importedCSVData = data;
                 showMappingFields(headers);
+                if (importStatus) importStatus.textContent = `File loaded successfully. Found ${data.length} rows.`;
                 if (leadsContainer) {
                     delete leadsContainer.dataset.loading;
                     renderLeads(leadsContainer, filteredLeads, leadCountElement);
@@ -808,6 +1112,12 @@ if (leadsFileInput) {
 }
 
 function showMappingFields(headers) {
+    const mappingSection = document.getElementById('mappingSection');
+    const mappingFields = document.getElementById('mappingFields');
+    const submitImportBtn = document.getElementById('submitImportBtn');
+    
+    if (!mappingFields) return;
+    
     mappingFields.innerHTML = '';
     REQUIRED_FIELDS.forEach(field => {
         const group = document.createElement('div');
@@ -825,29 +1135,45 @@ function showMappingFields(headers) {
         group.appendChild(select);
         mappingFields.appendChild(group);
     });
-    mappingSection.classList.remove('hidden');
-    submitImportBtn.classList.remove('hidden');
+    if (mappingSection) mappingSection.classList.remove('hidden');
+    if (submitImportBtn) submitImportBtn.classList.remove('hidden');
 }
 
-if (document.getElementById('importForm')) {
-    document.getElementById('importForm').addEventListener('submit', function(e) {
+// Initialize import form functionality
+function initializeImportForm() {
+    const importForm = document.getElementById('importForm');
+    const mappingSection = document.getElementById('mappingSection');
+    const mappingFields = document.getElementById('mappingFields');
+    const submitImportBtn = document.getElementById('submitImportBtn');
+    const importStatus = document.getElementById('importStatus');
+    const leadsContainer = document.getElementById('leadsContainer');
+    const leadCountElement = document.getElementById('leadCount');
+    
+    if (!importForm) return;
+    
+    importForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        if (!mappingFields) {
+            if (importStatus) importStatus.textContent = 'Mapping fields not found.';
+            return;
+        }
+        
         const selects = mappingFields.querySelectorAll('select');
         const mapping = {};
         selects.forEach(sel => {
             mapping[sel.dataset.fieldKey] = sel.value;
         });
+        
         if (Object.values(mapping).some(v => !v)) {
-            importStatus.textContent = 'Please map all required fields.';
+            if (importStatus) importStatus.textContent = 'Please map all required fields.';
             return;
         }
-        // Show loader and progress bar
-        if (typeof window.showImportProgress === 'function') window.showImportProgress(0);
-        // Scroll to progress bar
-        var progressBar = document.getElementById('importProgressBar');
-        if (progressBar) {
-            progressBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        
+        // Clear any previous status
+        if (importStatus) importStatus.textContent = 'Processing leads...';
+        
+        // Show loader
         if (leadsContainer) {
             leadsContainer.dataset.loading = 'true';
             renderLeads(leadsContainer, [], leadCountElement);
@@ -856,41 +1182,47 @@ if (document.getElementById('importForm')) {
         function scoreAndExplain(lead) {
             return window.getLeadScoreFromAPI(lead);
         }
-        // Async ML scoring for all leads with error logging
+        // Fast parallel ML scoring for all leads with concurrency limit
         (async () => {
+            const CONCURRENCY_LIMIT = 20; // Number of parallel requests
             const leads = [];
             let errorOccurred = false;
-            const total = importedCSVData.length;
-            for (let idx = 0; idx < total; idx++) {
-                try {
-                    const row = importedCSVData[idx];
-                    const pageViews = parseInt(row[mapping.pageViews] || '0', 10);
-                    const downloads = parseInt(row[mapping.downloads] || '0', 10);
-                    const webinar = (row[mapping.webinarAttended] || '').toLowerCase() === 'yes';
-                    // Robust normalization for industry and companySize
-                    const INDUSTRY_OPTIONS = [
-                        'Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Education', 'Retail', 'Energy'
-                    ];
-                    const SIZE_OPTIONS = [
-                        'Enterprise', 'Mid-Market', 'Small Business'
-                    ];
-                    let rawIndustry = row[mapping.industry] || '';
-                    let normIndustry = INDUSTRY_OPTIONS.find(opt => opt.toLowerCase() === rawIndustry.trim().toLowerCase()) || rawIndustry.trim();
-                    let rawSize = row[mapping.companySize] || '';
-                    let normSize = SIZE_OPTIONS.find(opt => opt.toLowerCase() === rawSize.trim().toLowerCase()) || rawSize.trim();
-                    const lead = {
-                        id: leadsData.length + idx + 1,
-                        contact: row[mapping.contact],
-                        company: row[mapping.company],
-                        title: row[mapping.title],
-                        industry: normIndustry,
-                        companySize: normSize,
-                        email: row[mapping.email],
-                        website: row[mapping.website],
-                        pageViews,
-                        downloads,
-                        webinarAttended: webinar
-                    };
+
+            console.log('Starting fast import for', importedCSVData.length, 'leads');
+
+            // Prepare all lead objects first
+            const allLeadObjs = importedCSVData.map((row, idx) => {
+                const pageViews = parseInt(row[mapping.pageViews] || '0', 10);
+                const downloads = parseInt(row[mapping.downloads] || '0', 10);
+                const webinar = (row[mapping.webinarAttended] || '').toLowerCase() === 'yes';
+                const INDUSTRY_OPTIONS = [
+                    'Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Education', 'Retail', 'Energy'
+                ];
+                const SIZE_OPTIONS = [
+                    'Enterprise', 'Mid-Market', 'Small Business'
+                ];
+                let rawIndustry = row[mapping.industry] || '';
+                let normIndustry = INDUSTRY_OPTIONS.find(opt => opt.toLowerCase() === rawIndustry.trim().toLowerCase()) || rawIndustry.trim();
+                let rawSize = row[mapping.companySize] || '';
+                let normSize = SIZE_OPTIONS.find(opt => opt.toLowerCase() === rawSize.trim().toLowerCase()) || rawSize.trim();
+                return {
+                    id: leadsData.length + idx + 1,
+                    contact: row[mapping.contact],
+                    company: row[mapping.company],
+                    title: row[mapping.title],
+                    industry: normIndustry,
+                    companySize: normSize,
+                    email: row[mapping.email],
+                    website: row[mapping.website],
+                    pageViews,
+                    downloads,
+                    webinarAttended: webinar
+                };
+            });
+
+            // Helper for concurrency
+            async function processBatch(batch) {
+                return await Promise.allSettled(batch.map(async (lead) => {
                     let ai;
                     try {
                         ai = await scoreAndExplain(lead);
@@ -898,47 +1230,59 @@ if (document.getElementById('importForm')) {
                         ai = null;
                     }
                     if (!ai || typeof ai.score === 'undefined' || ai.error) {
-                        // API error or no score returned
-                        leads.push({
+                        return {
                             ...lead,
                             intentScore: 0,
                             insights: ['Unable to score this lead due to a technical issue.'],
                             recommendedAction: 'Please try importing this lead again later or contact support.',
                             reasoning: 'Lead could not be scored due to an API error.'
-                        });
-                        // Update progress bar
-                        if (typeof window.showImportProgress === 'function') window.showImportProgress(Math.round(((idx + 1) / total) * 100));
-                        continue;
+                        };
                     }
                     // Enhanced insights and reasoning
                     const insights = [];
-                    if (pageViews > 0) insights.push(`Visited the website ${pageViews} times`);
-                    if (downloads > 0) insights.push(`Downloaded ${downloads} resources`);
-                    if (webinar) insights.push('Attended a recent webinar');
+                    if (lead.pageViews > 0) insights.push(`Visited the website ${lead.pageViews} times.`);
+                    if (lead.downloads > 0) insights.push(`Downloaded ${lead.downloads} resources.`);
+                    if (lead.webinarAttended) insights.push('Attended a recent webinar.');
                     if (ai.explanation && Array.isArray(ai.explanation) && ai.explanation.length > 0) {
                         ai.explanation.forEach(e => {
-                            if (e.impact > 0) insights.push(`Strong positive: ${e.feature}`);
-                            else if (e.impact < 0) insights.push(`Negative: ${e.feature}`);
+                            if (e.impact > 0) insights.push(`Strong positive: ${e.feature}.`);
+                            else if (e.impact < 0) insights.push(`Negative: ${e.feature}.`);
                         });
                     }
                     // Compose a more natural and dynamic reasoning
                     let reasoning = '';
                     if (ai.explanation && Array.isArray(ai.explanation) && ai.explanation.length > 0) {
-                        // Filter out API error explanations
                         const validExplanations = ai.explanation.filter(e => e.feature && e.feature !== 'API Error');
                         if (validExplanations.length > 0) {
-                            reasoning = `This lead's score is driven by: ` +
-                                validExplanations.map(e => `${e.feature} (${e.impact > 0 ? 'positive' : 'negative'} impact)`).join(', ') + '.';
+                            // Template-based, human-readable reasoning
+                            const reasonTemplates = [];
+                            validExplanations.forEach(e => {
+                                if (e.feature === 'Page Views' && lead.pageViews > 0) {
+                                    reasonTemplates.push(`High website engagement (${lead.pageViews} page views)`);
+                                } else if (e.feature === 'Downloads' && lead.downloads > 0) {
+                                    reasonTemplates.push(`Interest in resources (${lead.downloads} downloads)`);
+                                } else if (e.feature === 'Webinar Attendance' && lead.webinarAttended) {
+                                    reasonTemplates.push('Participation in a recent webinar');
+                                } else if (e.feature === 'Company Size' && lead.companySize) {
+                                    reasonTemplates.push(`Company size: ${lead.companySize}`);
+                                } else if (e.feature === 'Industry' && lead.industry) {
+                                    reasonTemplates.push(`Industry: ${lead.industry}`);
+                                }
+                            });
+                            if (reasonTemplates.length > 0) {
+                                reasoning = `This score reflects ${reasonTemplates.join(', ')}.`;
+                            } else {
+                                reasoning = `Score is based on available engagement and company attributes.`;
+                            }
                         } else {
                             reasoning = null;
                         }
                     }
-                    // If no valid explanation, generate a dynamic fallback
                     if (!reasoning) {
                         const reasons = [];
-                        if (pageViews > 0) reasons.push(`high website engagement (${pageViews} page views)`);
-                        if (downloads > 0) reasons.push(`interest in resources (${downloads} downloads)`);
-                        if (webinar) reasons.push('participation in a recent webinar');
+                        if (lead.pageViews > 0) reasons.push(`high website engagement (${lead.pageViews} page views)`);
+                        if (lead.downloads > 0) reasons.push(`interest in resources (${lead.downloads} downloads)`);
+                        if (lead.webinarAttended) reasons.push('participation in a recent webinar');
                         if (lead.companySize) reasons.push(`company size: ${lead.companySize}`);
                         if (lead.industry) reasons.push(`industry: ${lead.industry}`);
                         if (reasons.length > 0) {
@@ -947,44 +1291,57 @@ if (document.getElementById('importForm')) {
                             reasoning = 'Score is based on available engagement and company attributes.';
                         }
                     }
-                    // Compose a more tailored recommended action
                     let recommendedAction = '';
                     if (ai.score >= 0.85) {
                         recommendedAction = 'Assign to a senior SDR for immediate follow-up. Consider a personalized demo or proposal.';
-                        if (webinar) recommendedAction += ' Leverage their recent webinar attendance.';
-                        if (downloads > 2) recommendedAction += ' Highlight downloaded resources in outreach.';
+                        if (lead.webinarAttended) recommendedAction += ' Leverage their recent webinar attendance.';
+                        if (lead.downloads > 2) recommendedAction += ' Highlight downloaded resources in outreach.';
                     } else if (ai.score >= 0.6) {
                         recommendedAction = 'Nurture with targeted content and schedule a discovery call.';
-                        if (pageViews > 5) recommendedAction += ' Reference their high website engagement.';
+                        if (lead.pageViews > 5) recommendedAction += ' Reference their high website engagement.';
                     } else {
                         recommendedAction = 'Add to a long-term nurture campaign and monitor for future engagement.';
-                        if (pageViews === 0 && downloads === 0) recommendedAction += ' Encourage initial engagement.';
+                        if (lead.pageViews === 0 && lead.downloads === 0) recommendedAction += ' Encourage initial engagement.';
                     }
-                    leads.push({
+                    return {
                         ...lead,
                         intentScore: Math.round(ai.score * 100),
                         insights,
                         recommendedAction,
                         reasoning
-                    });
-                    // Update progress bar
-                    if (typeof window.showImportProgress === 'function') window.showImportProgress(Math.round(((idx + 1) / total) * 100));
-                } catch (err) {
-                    errorOccurred = true;
-                    console.error('Error importing lead:', err);
-                    if (importStatus) importStatus.textContent = 'Error importing leads: ' + (err.message || err);
-                    // Update progress bar on error
-                    if (typeof window.showImportProgress === 'function') window.showImportProgress(Math.round(((idx + 1) / total) * 100));
-                }
+                    };
+                }));
             }
+
+            // Main batching loop
+            let idx = 0;
+            while (idx < allLeadObjs.length) {
+                const batch = allLeadObjs.slice(idx, idx + CONCURRENCY_LIMIT);
+                const results = await processBatch(batch);
+                results.forEach(res => {
+                    if (res.status === 'fulfilled') {
+                        leads.push(res.value);
+                    } else if (res.status === 'rejected') {
+                        errorOccurred = true;
+                    } else {
+                        leads.push(res);
+                    }
+                });
+                idx += CONCURRENCY_LIMIT;
+                if (importStatus) importStatus.textContent = `Imported ${leads.length} of ${allLeadObjs.length} leads...`;
+            }
+
+            console.log('Fast import complete. Leads processed:', leads.length, 'Errors:', errorOccurred);
+
             if (!errorOccurred && leads.length > 0) {
                 leadsData.push(...leads);
                 // Persist to localStorage
                 try {
-                    localStorage.setItem('leadsData', JSON.stringify(leadsData));
-                } catch (e) {}
-                if (typeof window.hideImportProgress === 'function') window.hideImportProgress();
-                if (typeof window.showImportSuccess === 'function') window.showImportSuccess(`Successfully imported ${leads.length} leads!`);
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(leadsData));
+                } catch (e) {
+                    console.warn('Failed to save leads to localStorage:', e);
+                }
+                if (importStatus) importStatus.textContent = `Successfully imported ${leads.length} leads!`;
                 setTimeout(() => {
                     updateAllLeadsView();
                     hotLeads = leadsData.filter(lead => lead.intentScore >= 85);
@@ -992,41 +1349,21 @@ if (document.getElementById('importForm')) {
                     if (typeof renderAnalytics === 'function') renderAnalytics();
                     updateKPICards();
                 }, 50);
-                this.reset();
-                mappingSection.classList.add('hidden');
-                submitImportBtn.classList.add('hidden');
+                importForm.reset();
+                if (mappingSection) mappingSection.classList.add('hidden');
+                if (submitImportBtn) submitImportBtn.classList.add('hidden');
             } else if (errorOccurred) {
-                if (typeof window.hideImportProgress === 'function') window.hideImportProgress();
                 if (importStatus) importStatus.textContent = 'Some leads could not be imported. Please check the data and try again.';
+            } else {
+                if (importStatus) importStatus.textContent = 'No leads were imported. Please check your CSV file and mapping.';
             }
             if (leadsContainer) {
                 delete leadsContainer.dataset.loading;
                 renderLeads(leadsContainer, filteredLeads, leadCountElement);
             }
         })();
-// --- ML API Integration ---
-window.getLeadScoreFromAPI = async function(lead) {
-    // Map JS lead fields to backend expected fields
-    const payload = {
-        'Title': lead.title,
-        'Industry': lead.industry,
-        'Company Size': lead.companySize,
-        'Page Views': lead.pageViews,
-        'Downloads': lead.downloads,
-        'Webinar Attended': lead.webinarAttended ? 1 : 0
-    };
-    try {
-        const res = await fetch('http://localhost:5000/score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('ML API error');
-        return await res.json();
-    } catch (e) {
-        return { score: 0.5, explanation: [{ feature: 'API Error', impact: 0 }] };
-    }
-};
+    });
+}
 
 // --- Feedback UI in Reasoning Modal ---
 (function() {
@@ -1058,5 +1395,3 @@ window.getLeadScoreFromAPI = async function(lead) {
         }
     });
 })();
-    });
-}
