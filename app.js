@@ -943,7 +943,31 @@ window.filteredHotLeads = filteredHotLeads;
 
 // --- ML API Integration ---
 window.getLeadScoreFromAPI = async function(lead) {
-    // Map JS lead fields to backend expected fields
+    // Try to use the JavaScript ML model first
+    try {
+        // Check if the ML model is available
+        if (typeof predictLeadScore === 'function') {
+            console.log('Using JavaScript ML model for scoring');
+            
+            // Map JS lead fields to ML model expected format
+            const payload = {
+                'title': lead.title,
+                'industry': lead.industry,
+                'companySize': lead.companySize,
+                'pageViews': lead.pageViews,
+                'downloads': lead.downloads,
+                'webinarAttended': lead.webinarAttended ? 1 : 0
+            };
+            
+            const result = predictLeadScore(payload);
+            console.log('ML prediction result:', result);
+            return result;
+        }
+    } catch (e) {
+        console.warn('JavaScript ML model failed, trying API fallback:', e.message);
+    }
+    
+    // Fallback to API if ML model is not available
     const payload = {
         'Title': lead.title,
         'Industry': lead.industry,
@@ -959,10 +983,11 @@ window.getLeadScoreFromAPI = async function(lead) {
             body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`ML API error: ${res.status}`);
+        console.log('Using Python API for scoring');
         return await res.json();
     } catch (e) {
-        console.warn('ML API unavailable, using fallback scoring:', e.message);
-        // Fallback scoring when API is unavailable
+        console.warn('Both ML model and API unavailable, using rule-based fallback:', e.message);
+        // Fallback scoring when both ML model and API are unavailable
         return generateFallbackScore(lead);
     }
 };
