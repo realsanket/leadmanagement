@@ -22,7 +22,10 @@ joblib.dump(model, 'lead_model.pkl')
 explainer = shap.TreeExplainer(model)
 
 from chat_api import chat_api
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all domains
 app.register_blueprint(chat_api)
 
 @app.route('/score', methods=['POST'])
